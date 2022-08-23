@@ -4,6 +4,15 @@
 
 static const char CMD_LED_NAME[] = "led";
 
+typedef struct {
+  GPIO_TypeDef*       GPIO;
+  uint16_t            Pin;
+} Led_PinConfig;
+
+static const Led_PinConfig LEDS[] = {
+  {LED_GREEN_GPIO_Port, LED_GREEN_Pin},
+  {LED_RED_GPIO_Port, LED_RED_Pin},
+};
 
 static Cmd_Handled Led_onSet(CmdManager* manager, Cmd* cmd, Param_Cursor* cursor, Cmd_Type type);
 static Cmd_Handled Led_onGet(CmdManager* manager, Cmd* cmd, Param_Cursor* cursor, Cmd_Type type);
@@ -47,6 +56,8 @@ static Cmd_Handled Led_onSet(CmdManager* manager, Cmd* cmd, Param_Cursor* cursor
   }
   state = param.Value.State;
   
+  // classic way
+  /*
   switch (num) {
     case 0:
       HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, (GPIO_PinState) state);
@@ -58,6 +69,9 @@ static Cmd_Handled Led_onSet(CmdManager* manager, Cmd* cmd, Param_Cursor* cursor
       
       break;
   }
+  */
+  // array way
+  HAL_GPIO_WritePin(LEDS[num].GPIO, LEDS[num].Pin, (GPIO_PinState) state);
   
   OStream_writeBytes(&uartStream->Output, (uint8_t*) OK, sizeof(OK) - 1);
   OStream_flush(&uartStream->Output);
